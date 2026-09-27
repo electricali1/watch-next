@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <%- include('./partials/navbar') %>
+
+        <h1>All Lists</h1>
+
+        <% for(let oneList of lists){ %>
+            <p>List: <%= oneList.title %>
+            </p>
+            <a href="/lists/<%= oneList._id %>">See Details</a>
+            <% } %>
+</body>
+
+</html>

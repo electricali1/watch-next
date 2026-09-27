@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update List</title>
+</head>
+
+<body>
+    <%- include('./partials/navbar') %>
+
+        <h1>Update List</h1>
+
+        <form action="/lists/<%= list._id %>?_method=PUT" method="post">
+            <label for="title">Title:</label>
+            <input value="<%= list.title %>" name="title" id="title" type="text" required>
+
+            <label for="description">Description:</label>
+            <input value="<%= list.description || '' %>" name="description" id="description" type="text">
+
+            <button>Update List</button>
+        </form>
+</body>
+
+</html>

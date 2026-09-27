@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <%- include('./partials/navbar') %>
+
+        <h1>
+            <%= list.title %>
+        </h1>
+        <h2>By: <%= list.user_id.username %>
+        </h2>
+
+        <p>
+            <%= list.description %>
+        </p>
+
+        <% if (user && list.user_id._id.equals(user._id)) { %>
+            <form action="/lists/<%= list._id %>?_method=DELETE" method="post">
+                <button>Delete List</button>
+            </form>
+
+            <a href="/lists/<%= list._id %>/edit">Edit List</a>
+            <% } %>
+
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+// imports
+const dns = require("node:dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+const express = require("express") //importing express package
+const app = express() // creates a express application
+const dotenv = require("dotenv").config() //this allows me to use my .env values in this file
+const morgan = require('morgan')
+const session = require('express-session');
+const methodOverride = require('method-override')
+const { MongoStore } = require("connect-mongo");
+const connectToDB = require('./db.js')
+
+// middleware imports
+const isSignedIn = require("./middleware/is-signed-in.js");
+const passUserToView = require("./middleware/pass-user-to-view.js");
+
+// routes Imports
+const authController = require("./routes/auth.routes.js");
+const indexController = require("./routes/index.routes.js");
+const listsRoutes = require('./routes/lists.routes.js')
+const moviesRoutes = require("./routes/movies.routes.js");
+
+// Middleware
+app.use(express.static('public')) // my app will serve all static files from public folder
+app.use(express.urlencoded({ extended: false }));
+app.use(morgan('dev'))
+app.use(methodOverride('_method'))
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI,
+            collectionName: "sessions"
+        }),
+
+        cookie: {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 // 1 day
+        }
+    })
+);
+app.use(passUserToView)
+
+
+
+
+
+
+
+
+
+
+
+// Routes go here
+app.use('/auth', authController);
+app.use('/lists', listsRoutes);
+app.use('/movies', moviesRoutes);
+app.use('/', indexController);
+
+
+
+
+// connect to database and listen on Port 3000
+async function startServer() {
+    const PORT = process.env.PORT || 3000;
+    await connectToDB();
+
+    app.listen(PORT, () => {
+        console.log(`App is running on port ${PORT}`);
+    });
+}
+
+startServer();
