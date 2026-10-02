@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-// Subdocument schema matching List.movies in your ERD
 const listMovieSchema = new mongoose.Schema({
   movie_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -11,8 +10,9 @@ const listMovieSchema = new mongoose.Schema({
     type: Number,
     default: 1
   },
-  poster: {
-    type: String,
+  order: {
+    type: Number,
+    default: 1
   },
   watchDate: {
     type: Date
@@ -24,7 +24,7 @@ const listMovieSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
-}); //
+})
 
 const listSchema = new mongoose.Schema({
   title: {
@@ -44,6 +44,8 @@ const listSchema = new mongoose.Schema({
     required: true
   },
   movies: [listMovieSchema]
-}, { timestamps: true });
+}, { timestamps: true })
 
-module.exports = mongoose.model('List', listSchema);
+const List = mongoose.model('List', listSchema)
+
+module.exports = List

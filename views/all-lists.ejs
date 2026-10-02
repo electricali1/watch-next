@@ -2,21 +2,49 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <%- include('partials/head', { title: 'My Watchlists' }) %>
 </head>
 
 <body>
-    <%- include('./partials/navbar') %>
+    <%- include('partials/nav') %>
 
-        <h1>All Lists</h1>
+    <main>
+        <h1>My Watchlists</h1>
 
-        <% for(let oneList of lists){ %>
-            <p>List: <%= oneList.title %>
-            </p>
-            <a href="/lists/<%= oneList._id %>">See Details</a>
+        <form action="/lists" method="POST" class="form-box">
+            <h2>Create Watchlist</h2>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" required>
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description">
+            <button type="submit">Create Watchlist</button>
+        </form>
+
+        <% if (lists.length === 0) { %>
+            <p class="muted">No watchlists available.</p>
+        <% } %>
+
+        <div class="grid">
+            <% for (let list of lists) { %>
+                <div class="list-card">
+                    <h3><%= list.title %></h3>
+                    <% if (list.isMainWatchlist) { %>
+                        <p class="muted">Main Watchlist</p>
+                    <% } %>
+                    <% if (list.description) { %>
+                        <p><%= list.description %></p>
+                    <% } %>
+                    <p><%= list.movies.length %> movie(s)</p>
+                    <div class="row">
+                        <a href="/lists/<%= list._id %>" class="btn">View</a>
+                        <a href="/lists/<%= list._id %>/edit" class="btn">Edit</a>
+                    </div>
+                </div>
             <% } %>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
 </body>
 
 </html>

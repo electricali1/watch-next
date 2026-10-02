@@ -2,25 +2,79 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update List</title>
+    <%- include('partials/head', { title: 'Edit ' + list.title }) %>
 </head>
 
 <body>
-    <%- include('./partials/navbar') %>
+    <%- include('partials/nav') %>
 
-        <h1>Update List</h1>
+    <main>
+        <h1>Edit Watchlist</h1>
 
-        <form action="/lists/<%= list._id %>?_method=PUT" method="post">
-            <label for="title">Title:</label>
-            <input value="<%= list.title %>" name="title" id="title" type="text" required>
-
-            <label for="description">Description:</label>
-            <input value="<%= list.description || '' %>" name="description" id="description" type="text">
-
-            <button>Update List</button>
+        <form action="/lists/<%= list._id %>?_method=PUT" method="POST" class="form-box">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" value="<%= list.title %>" required>
+            <label for="description">Description</label>
+            <input type="text" name="description" id="description" value="<%= list.description %>">
+            <button type="submit">Save Details</button>
         </form>
+
+        <h2>Movies</h2>
+        <p class="muted">Movies are sorted by priority. When two movies have the same priority, the lower Order # comes first.</p>
+
+        <% if (list.movies.length === 0) { %>
+            <p class="muted">No movies in this list. <a href="/movies">Search movies to add</a>.</p>
+        <% } %>
+
+        <% for (let item of list.movies) { %>
+            <div class="movie-row">
+                <% if (item.movie_id.posterPath) { %>
+                    <img src="https://image.tmdb.org/t/p/w92<%= item.movie_id.posterPath %>" alt="Poster for <%= item.movie_id.title %>">
+                <% } %>
+
+                <div>
+                    <h3><%= item.movie_id.title %></h3>
+
+                    <form action="/lists/<%= list._id %>/movies/<%= item._id %>?_method=PUT" method="POST" class="row">
+                        <label>
+                            Priority
+                            <select name="priority">
+                                <option value="1" <%= item.priority === 1 ? 'selected' : '' %>>1 - Watch Next</option>
+                                <option value="2" <%= item.priority === 2 ? 'selected' : '' %>>2 - Watch After</option>
+                                <option value="3" <%= item.priority === 3 ? 'selected' : '' %>>3 - Watch Later</option>
+                                <option value="4" <%= item.priority === 4 ? 'selected' : '' %>>4 - Backburner</option>
+                            </select>
+                        </label>
+                        <label>
+                            Order #
+                            <input type="number" name="order" value="<%= item.order %>" min="1" required>
+                        </label>
+                        <label>
+                            Date
+                            <input type="date" name="watchDate" value="<%= item.watchDate ? item.watchDate.toISOString().slice(0, 10) : '' %>">
+                        </label>
+                        <label>
+                            Time
+                            <input type="time" name="watchTime" value="<%= item.watchTime %>">
+                        </label>
+                        <label>
+                            <input type="checkbox" name="isWatched" value="true" <%= item.isWatched ? 'checked' : '' %>>
+                            Watched
+                        </label>
+                        <button type="submit">Save</button>
+                    </form>
+                </div>
+
+                <form action="/lists/<%= list._id %>/movies/<%= item._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Are you sure?');">
+                    <button type="submit" class="btn-delete">Remove</button>
+                </form>
+            </div>
+        <% } %>
+
+        <p><a href="/lists/<%= list._id %>">Back to Watchlist</a></p>
+    </main>
+
+    <%- include('partials/footer') %>
 </body>
 
 </html>

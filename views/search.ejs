@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head', { title: 'Search Movies' }) %>
+</head>
+
+<body>
+    <%- include('partials/nav') %>
+
+    <main>
+        <h1>Search Movies</h1>
+
+        <form action="/movies" method="GET" class="row">
+            <label for="q">Movie title</label>
+            <input type="text" name="q" id="q" value="<%= searchQuery %>" required>
+            <button type="submit">Search</button>
+        </form>
+
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <% if (searchQuery && movies.length === 0 && !error) { %>
+            <p class="muted">No movies found for "<%= searchQuery %>".</p>
+        <% } %>
+
+        <% if (movies.length > 0 && userLists.length === 0) { %>
+            <p class="muted"><a href="/lists">Create a watchlist</a> first to save movies.</p>
+        <% } %>
+
+        <% if (movies.length > 0) { %>
+            <h2>Results</h2>
+        <% } %>
+
+        <div class="grid">
+            <% for (let movie of movies) { %>
+                <div class="card">
+                    <% if (movie.poster_path) { %>
+                        <img src="https://image.tmdb.org/t/p/w200<%= movie.poster_path %>" alt="Poster for <%= movie.title %>">
+                    <% } else { %>
+                        <div class="no-poster">No Poster</div>
+                    <% } %>
+                    <h3><%= movie.title %></h3>
+                    <% if (movie.release_date) { %>
+                        <p class="muted">Year: <%= movie.release_date.slice(0, 4) %></p>
+                    <% } %>
+
+                    <% if (userLists.length > 0) { %>
+                        <form action="/lists/add-movie" method="POST">
+                            <input type="hidden" name="tmdbId" value="<%= movie.id %>">
+                            <input type="hidden" name="title" value="<%= movie.title %>">
+                            <input type="hidden" name="overview" value="<%= movie.overview %>">
+                            <input type="hidden" name="posterPath" value="<%= movie.poster_path %>">
+                            <label>
+                                Watchlist
+                                <select name="listId">
+                                    <% for (let list of userLists) { %>
+                                        <option value="<%= list._id %>"><%= list.title %></option>
+                                    <% } %>
+                                </select>
+                            </label>
+                            <label>
+                                Priority
+                                <select name="priority">
+                                    <option value="1">1 - Watch Next</option>
+                                    <option value="2">2 - Watch After</option>
+                                    <option value="3">3 - Watch Later</option>
+                                    <option value="4">4 - Backburner</option>
+                                </select>
+                            </label>
+                            <label>
+                                Order #
+                                <input type="number" name="order" value="1" min="1" required>
+                            </label>
+                            <button type="submit">Add to List</button>
+                        </form>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>

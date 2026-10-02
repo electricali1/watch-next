@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head', { title: 'Home' }) %>
+</head>
+
+<body>
+    <%- include('partials/nav') %>
+
+    <main>
+        <% if (!user) { %>
+            <h1>Watch Next</h1>
+            <p>A movie watchlist tracker that uses a priority queue to help you decide what to watch next. Save movies to your lists, give each one a priority, and always know which film is up next.</p>
+            <div class="row">
+                <a href="/auth/sign-up" class="btn">Sign Up</a>
+                <a href="/auth/sign-in" class="btn">Sign In</a>
+            </div>
+        <% } else { %>
+            <h1>Dashboard</h1>
+            <p class="muted">Your Watch Next movies from each list.</p>
+
+            <% if (userLists.length === 0) { %>
+                <p class="muted">No watchlists available.</p>
+            <% } %>
+
+            <% for (let list of userLists) { %>
+                <section>
+                    <h2><%= list.title %> <a href="/lists/<%= list._id %>">View list</a></h2>
+
+                    <% if (list.watchNextMovies.length === 0) { %>
+                        <p class="muted">No movies to watch next in this list.</p>
+                    <% } %>
+
+                    <div class="grid">
+                        <% for (let item of list.watchNextMovies) { %>
+                            <div class="card">
+                                <% if (item.movie_id.posterPath) { %>
+                                    <img src="https://image.tmdb.org/t/p/w200<%= item.movie_id.posterPath %>" alt="Poster for <%= item.movie_id.title %>">
+                                <% } else { %>
+                                    <div class="no-poster">No Poster</div>
+                                <% } %>
+                                <h3><%= item.movie_id.title %></h3>
+                            </div>
+                        <% } %>
+                    </div>
+                </section>
+            <% } %>
+        <% } %>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>

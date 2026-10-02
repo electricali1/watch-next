@@ -2,32 +2,68 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <%- include('partials/head', { title: list.title }) %>
 </head>
 
 <body>
-    <%- include('./partials/navbar') %>
+    <%- include('partials/nav') %>
 
-        <h1>
-            <%= list.title %>
-        </h1>
-        <h2>By: <%= list.user_id.username %>
-        </h2>
+    <main>
+        <div class="page-header">
+            <div>
+                <h1><%= list.title %></h1>
+                <% if (list.isMainWatchlist) { %>
+                    <p class="muted">Main Watchlist</p>
+                <% } %>
+                <p class="muted">Created by: <%= list.user_id.username %></p>
+                <% if (list.description) { %>
+                    <p><%= list.description %></p>
+                <% } %>
+            </div>
 
-        <p>
-            <%= list.description %>
-        </p>
-
-        <% if (user && list.user_id._id.equals(user._id)) { %>
-            <form action="/lists/<%= list._id %>?_method=DELETE" method="post">
-                <button>Delete List</button>
-            </form>
-
-            <a href="/lists/<%= list._id %>/edit">Edit List</a>
+            <% if (list.user_id._id.equals(user._id)) { %>
+                <div class="row">
+                    <a href="/lists/<%= list._id %>/edit" class="btn">Edit List</a>
+                    <% if (!list.isMainWatchlist) { %>
+                        <form action="/lists/<%= list._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn-delete">Delete List</button>
+                        </form>
+                    <% } %>
+                </div>
             <% } %>
+        </div>
 
+        <h2>Movies (<%= list.movies.length %>)</h2>
+
+        <% if (list.movies.length === 0) { %>
+            <p class="muted">No movies in this list. <a href="/movies">Search movies to add</a>.</p>
+        <% } %>
+
+        <% const priorityLabels = { 1: 'Watch Next', 2: 'Watch After', 3: 'Watch Later', 4: 'Backburner' } %>
+
+        <div class="grid">
+            <% for (let item of list.movies) { %>
+                <div class="card">
+                    <% if (item.movie_id.posterPath) { %>
+                        <img src="https://image.tmdb.org/t/p/w200<%= item.movie_id.posterPath %>" alt="Poster for <%= item.movie_id.title %>">
+                    <% } else { %>
+                        <div class="no-poster">No Poster</div>
+                    <% } %>
+                    <h3><%= item.movie_id.title %></h3>
+                    <p><span class="badge priority-<%= item.priority %>"><%= item.priority %> - <%= priorityLabels[item.priority] %></span></p>
+                    <% if (item.watchDate) { %>
+                        <p>Date: <%= item.watchDate.toLocaleDateString() %></p>
+                    <% } %>
+                    <% if (item.watchTime) { %>
+                        <p>Time: <%= item.watchTime %></p>
+                    <% } %>
+                    <p>Status: <%= item.isWatched ? 'Watched' : 'Unwatched' %></p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
 </body>
 
 </html>
